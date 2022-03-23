@@ -529,6 +529,8 @@ def acolite_l2w(gem,
 
             if (cur_par == 'chl_oc') | (cur_par == 'chl_oc2'):
                 par_name = 'chl_oc2'
+            elif (cur_par == 'chl_oc2_BLK'):
+                par_name = 'chl_oc2_BLK'
             elif (cur_par == 'chl_oc3'):
                 par_name = 'chl_oc3'
             elif (cur_par == 'chl_oc4'):
@@ -618,7 +620,7 @@ def acolite_l2w(gem,
 
                 ###########
                 ## MOSES
-                if par_split[2][0:5] == 'moses':
+                if par_split[2][0:6] == 'moses3':
                     chl_re_algorithm = 'moses'
                     par_attributes['reference']='Moses et al. 2012'
                     par_attributes['algorithm']='Moses et al. 3 band'
@@ -635,6 +637,23 @@ def acolite_l2w(gem,
                 ###########
 
                 ###########
+                ## MOSES 2B BLK
+                if par_split[2][0:6] == 'moses2':
+                    chl_re_algorithm = 'moses2bBLK'
+                    par_attributes['reference']='Moses et al. 2009'
+                    par_attributes['algorithm']='Moses et al. 2 band'
+                    par_attributes['a']=(44.24599,-29.95277) ## put coefficients in external file
+                    ### get required datasets
+                    if par_split[2] == 'moses2bBLK':
+                        req_waves = [670,705]
+                    else:
+                        print('Parameter {} not configured for {}.'.format(par_name,gem['gatts']['sensor']))
+                        continue
+
+                ## end MOSES 2B BLK
+                ###########
+
+                ###########
                 ## MISHRA
                 if par_split[2][0:6] == 'mishra':
                     chl_re_algorithm = 'mishra'
@@ -644,6 +663,17 @@ def acolite_l2w(gem,
                     ### get required datasets
                     req_waves = [670,705]
                 ## end MISHRA
+                ###########
+
+                ## MISHRA BLK
+                if par_split[2][0:9] == 'mishraBLK':
+                    chl_re_algorithm = 'mishraBLK'
+                    par_attributes['reference']='Mishra et al. 2014'
+                    par_attributes['algorithm']='Mishra et al. 2014, NDCI'
+                    par_attributes['a']=(14.41984, 22.31125, 4.5900) ## put coefficients in external file
+                    ### get required datasets
+                    req_waves = [670,705]
+                ## end MISHRA BLK
                 ###########
 
                 ###########
@@ -717,6 +747,18 @@ def acolite_l2w(gem,
                 ###########
 
                 ###########
+                ## compute MOSES 2B BLK
+                if chl_re_algorithm == 'moses2bBLK':
+                    par_data[par_name] = par_attributes['a'][0]* \
+                                        ((np.power(tmp_data[0],-1)) * \
+                                        tmp_data[1]) + par_attributes['a'][1]
+                    par_data[par_name][par_data[par_name]<0]=np.nan
+                    par_atts[par_name] = par_attributes
+                    tmp_data = None
+                ## end compute MOSES 2B BLK
+                ###########
+
+                ###########
                 ## compute MISHRA
                 if chl_re_algorithm == 'mishra':
                     ndci = (tmp_data[1]-tmp_data[0]) / (tmp_data[1]+tmp_data[0])
@@ -726,6 +768,18 @@ def acolite_l2w(gem,
                     par_atts[par_name] = par_attributes
                     tmp_data = None
                 ## end compute MISHRA
+                ###########
+
+                ###########
+                ## compute MISHRA BLK
+                if chl_re_algorithm == 'mishraBLK':
+                    ndci = (tmp_data[1]-tmp_data[0]) / (tmp_data[1]+tmp_data[0])
+                    par_data[par_name] = par_attributes['a'][0] + par_attributes['a'][1]*ndci + par_attributes['a'][2]*ndci*ndci
+                    ndci = None
+                    par_data[par_name][par_data[par_name]<0]=np.nan
+                    par_atts[par_name] = par_attributes
+                    tmp_data = None
+                ## end compute MISHRA BLK
                 ###########
 
                 ###########

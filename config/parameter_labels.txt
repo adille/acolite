@@ -57,7 +57,9 @@ chl_re_gons_nocheck,1,100,True,Calgae255,CHL Gons,mg m$^{-3}$
 chl_re_gons740_nocheck,1,100,True,Calgae255,CHL Gons740,mg m$^{-3}$
 chl_re_moses3b,1,100,True,Calgae255,CHL Moses,mg m$^{-3}$
 chl_re_moses3b740,1,100,True,Calgae255,CHL Moses740,mg m$^{-3}$
+chl_re_moses2bBLK,1,100,True,Calgae255,CHL Moses 2b BLK,mg m$^{-3}$
 chl_re_mishra,1,100,True,Calgae255,CHL Mishra,mg m$^{-3}$
+chl_re_mishraBLK,1,100,True,Calgae255,CHL Mishra BLK,mg m$^{-3}$
 chl_re_bramich,1,100,True,Calgae255,CHL Bramich,mg m$^{-3}$
 #
 ## indices
