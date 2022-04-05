@@ -693,9 +693,9 @@ def acolite_l2w(gem,
                     required_datasets,req_waves_selected = [],[]
                     ds_waves = [w for w in rhos_waves]
                     for i, reqw in enumerate(req_waves):
-                        widx,selwave = ac.shared.closest_idx(ds_waves, reqw)
+                        widx, selwave = ac.shared.closest_idx(ds_waves, reqw)
                         if abs(float(selwave)-float(reqw)) > 10: continue
-                        selds='{}_{}'.format(par_attributes['dataset'],selwave)
+                        selds ='{}_{}'.format(par_attributes['dataset'],selwave)
                         required_datasets.append(selds)
                         req_waves_selected.append(selwave)
                     par_attributes['waves']=req_waves_selected
