@@ -129,7 +129,7 @@ def acolite_run(settings, inputfile=None, output=None):
     import glob, datetime, os
     import acolite as ac
 
-    print('Running ACOLITE processing - {}'.format(ac.version))
+    print('Running ACOLITE processing - {}'.format(ac.version) + ' -- BLK v1)
     ## time of processing start
     time_start = datetime.datetime.now()
 
