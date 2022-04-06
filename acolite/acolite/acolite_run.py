@@ -354,7 +354,7 @@ def acolite_run(settings, inputfile=None, output=None):
     # AD
     # Create File for ONDA format
     print("\n> saving to ONDA format")
-    output_folder = setu['output']
+    output_folder = l1r_setu['output']
     print("\n> output folder: " + output_folder)
 
     allfiles = os.listdir(output_folder)
