@@ -355,6 +355,8 @@ def acolite_run(settings, inputfile=None, output=None):
     # Create File for ONDA format
     print("\n> saving to ONDA format")
     output_folder = setu['output']
+    print("\n> output folder: " + output_folder)
+
     allfiles = os.listdir(output_folder)
     S2_images_list = [image for image in allfiles if image[-len('L2W_GLAD.nc'):] in ['L2W_GLAD.nc']]
     S2_images_list_path = [output_folder + '/' + image for image in S2_images_list]
