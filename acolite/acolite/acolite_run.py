@@ -350,7 +350,28 @@ def acolite_run(settings, inputfile=None, output=None):
                 processed[i]['{}_reprojected'.format(otype)] = reprojected
     ## end reproject data
 
-    ## end processing loop
+
+    # AD
+    # Create File for ONDA format
+    print("\n> saving to ONDA format")
+    output_folder = setu['output']
+    allfiles = os.listdir(output_folder)
+    S2_images_list = [image for image in allfiles if image[-len('L2W_GLAD.nc'):] in ['L2W_GLAD.nc']]
+    S2_images_list_path = [output_folder + '/' + image for image in S2_images_list]
+
+    for L2W_file in S2_images_list_path:
+        create_S2_xarray_4_ONDA(L2W_file, output_folder)
+
+    removal_image_list = [image for image in allfiles if image[-len('.nc'):] in ['.nc']]
+    removal_image_list = [image for image in removal_image_list if image[-len('_S2.nc'):] not in ['_S2.nc']]
+
+    for file in removal_image_list:
+        try: os.remove(os.path.join(output_folder, file))
+        except: pass
+
+    # AD
+
+        ## end processing loop
     log.__del__()
 
     ## remove files
@@ -375,30 +396,13 @@ def acolite_run(settings, inputfile=None, output=None):
         delete_text = l1r_setu['delete_acolite_run_text_files']
         op, ri = l1r_setu['output'], l1r_setu['runid']
     except:
-        delete_text = False if 'delete_acolite_run_text_files' not in setu_l1r else setu_l1r['delete_acolite_run_text_files']
+        delete_text = False if 'delete_acolite_run_text_files' not in setu_l1r else setu_l1r[
+            'delete_acolite_run_text_files']
         op, ri = setu_l1r['output'], setu_l1r['runid']
 
     if delete_text:
         tfiles = glob.glob('{}/acolite_run_{}_*.txt'.format(op, ri))
         for tf in tfiles:
             os.remove(tf)
-
-    # AD
-    # Create File for ONDA format
-    print("\n> saving to ONDA format")
-    output_folder = setu['output']
-    allfiles = os.listdir(output_folder)
-    S2_images_list = [image for image in allfiles if image[-len('L2W_GLAD.nc'):] in ['L2W_GLAD.nc']]
-    S2_images_list_path = [output_folder + '/' + image for image in S2_images_list]
-
-    for L2W_file in S2_images_list_path:
-        create_S2_xarray_4_ONDA(L2W_file, output_folder)
-
-    removal_image_list = [image for image in allfiles if image[-len('.nc'):] in ['.nc']]
-    removal_image_list = [image for image in removal_image_list if image[-len('_S2.nc'):] not in ['_S2.nc']]
-
-    for file in removal_image_list:
-        try: os.remove(os.path.join(output_folder, file))
-        except: pass
 
     return(processed)
