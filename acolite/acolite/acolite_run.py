@@ -274,6 +274,7 @@ def acolite_run(settings, inputfile=None, output=None):
                     if type(l2r_setu['l2w_parameters']) is not list: l2r_setu['l2w_parameters'] = [l2r_setu['l2w_parameters']]
                     for ncf in l2r:
                         ret = ac.acolite.acolite_l2w(ncf, settings=l2r_setu)
+                        l2w_file_path=ret
                         if ret is not None:
                             if l2r_setu['l2w_export_geotiff']: ac.output.nc_to_geotiff(ret, match_file = l2r_setu['export_geotiff_match_file'],
                                                                             cloud_optimized_geotiff = l1r_setu['export_cloud_optimized_geotiff'],
@@ -354,7 +355,8 @@ def acolite_run(settings, inputfile=None, output=None):
     # AD
     # Create File for ONDA format
     print("\n> saving to ONDA format")
-    output_folder = l1r_setu['output']
+    # output_folder = l1r_setu['output']
+    output_folder = os.path.dirname(l2w_file_path)
     print("\n> output folder: " + output_folder)
 
     allfiles = os.listdir(output_folder)
