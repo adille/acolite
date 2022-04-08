@@ -88,6 +88,9 @@ def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
     ###
     #  2.b. attributes selection
     xds.attrs['contact'] = 'dvanderzande@naturalsciences.be, cgoyens@naturalsciences.be'
+    xds.attrs['Instrument'] = 'Sentinel-2'
+    xds.attrs['Sensor'] = 'Sentinel-2'
+    xds.attrs['Processing level'] = 'L2W'
 
     attrs_list_2keep = ['generated_by', 'generated_on', 'contact', 'product_type',
                   'metadata_profile', 'metadata_version', 'Conventions', 'sensor',
@@ -354,23 +357,20 @@ def acolite_run(settings, inputfile=None, output=None):
 
     # AD
     # Create File for ONDA format
+    image_list = []
     print("\n> saving to ONDA format")
-    # output_folder = l1r_setu['output']
-    output_folder = os.path.dirname(l2w_file_path)
-    print("\n> output folder: " + output_folder)
+    for key in [key for key in processed[0].keys() if key in ['l1r', 'l2r', 'l2w']]:
+        file = processed[0][key][0]
+        image_list.append(file)
+        print(file)
 
-    allfiles = os.listdir(output_folder)
-    S2_images_list = [image for image in allfiles if image[-len('L2W_GLAD.nc'):] in ['L2W_GLAD.nc']]
-    S2_images_list_path = [output_folder + '/' + image for image in S2_images_list]
+        if key == 'l2w':
+            create_S2_xarray_4_ONDA(file, os.path.dirname(file))
+        if key == 'l2r':
+            image_list.append(file[:-8] + '.nc')
 
-    for L2W_file in S2_images_list_path:
-        create_S2_xarray_4_ONDA(L2W_file, output_folder)
-
-    removal_image_list = [image for image in allfiles if image[-len('.nc'):] in ['.nc']]
-    removal_image_list = [image for image in removal_image_list if image[-len('_S2.nc'):] not in ['_S2.nc']]
-
-    for file in removal_image_list:
-        try: os.remove(os.path.join(output_folder, file))
+    for file in image_list:
+        try: os.remove( file)
         except: pass
 
     # AD
