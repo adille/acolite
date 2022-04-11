@@ -23,7 +23,9 @@ def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
         except:
             image_name = os.path.basename(S2_dataset)
     day = datetime.datetime(*map(int, image_name.split('_')[2:8]))
-
+    sensor = image_name.split('_')[0]
+    ofile = os.path.join(image_path, 'BLK_' + sensor + '_' + day.strftime('%Y_%m_%d') + '.nc')
+    
     # 2.a. variable selection
     vars_list_2keep = ['transverse_mercator',
                        'x',
@@ -32,7 +34,6 @@ def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
                        'lat',
                        'l2_flags',
                        'chl_oc2_BLK',
-                       'SPM_Nechad2010_665',
                        'chl_re_mishraBLK',
                        'SPM_Nechad2010_665',
                        'TUR_Nechad2009_665'
