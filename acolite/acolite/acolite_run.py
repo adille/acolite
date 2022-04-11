@@ -24,8 +24,7 @@ def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
             image_name = os.path.basename(S2_dataset)
     day = datetime.datetime(*map(int, image_name.split('_')[2:8]))
     sensor = image_name.split('_')[0]
-    ofile = os.path.join(image_path, 'BLK_' + sensor + '_' + day.strftime('%Y_%m_%d') + '.nc')
-    
+
     # 2.a. variable selection
     vars_list_2keep = ['transverse_mercator',
                        'x',
@@ -123,9 +122,12 @@ def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
     # Creates output folder if does not exists
     if os.path.exists(output_folder) is False: os.mkdir(output_folder)
 
-    out_name = 'BLK_' + day.strftime('%Y_%m_%d_') + 'S2' + '.nc'
+    # out_name = 'BLK_' + day.strftime('%Y_%m_%d_') + 'S2' + '.nc'
+    out_name =  'BLK_' + sensor + '_' + day.strftime('%Y_%m_%d') + '.nc'
+
     # save to netcdf
     xds.to_netcdf(os.path.join(output_folder, out_name))
+    xds.close()
 
     print('saved to --> ', out_name)
 
@@ -363,7 +365,7 @@ def acolite_run(settings, inputfile=None, output=None):
     for key in [key for key in processed[0].keys() if key in ['l1r', 'l2r', 'l2w']]:
         file = processed[0][key][0]
         image_list.append(file)
-        print(file)
+        # print(file)
 
         if key == 'l2w':
             create_S2_xarray_4_ONDA(file, os.path.dirname(file))
@@ -371,7 +373,9 @@ def acolite_run(settings, inputfile=None, output=None):
             image_list.append(file[:-8] + '.nc')
 
     for file in image_list:
-        try: os.remove( file)
+        # print(file)
+        # os.remove(file)
+        try: os.remove(file)
         except: pass
 
     # AD
