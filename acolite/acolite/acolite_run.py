@@ -5,131 +5,30 @@
 ## modifications: 2021-04-14 (QV) added output to settings if not configured
 ##                2021-04-15 (QV) test/parse input files
 ##                2022-03-04 (QV) moved inputfile testing to inputfile_test
+##                2023-03-29 (AD) modified for CS tiff
 
 # AD
-def create_S2_xarray_4_ONDA(S2_dataset, output_folder):
-    import os, datetime
-    import xarray as xr
-    import numpy as np
-    from scipy import ndimage
+def cleaning_4_CS(output_folder):
+    import os
+    print("\n >> renaming for CALLISTO platform")
+    # rename CHL, SPM and delete others
+    all_files = [file for file in os.listdir(output_folder)]
+    chl_file = [file for file in all_files if 'chl' in file and '_CHL.tif' not in file][0]
+    spm_file = [file for file in all_files if 'SPM' in file and '_SPM.tif' not in file][0]
+    tur_file = [file for file in all_files if 'TUR' in file and '_TUR.tif' not in file][0]
 
+    image_date = "".join(spm_file.split('_')[2:5])
+    image_time = "".join(spm_file.split('_')[5:8])
 
-    xds = xr.open_dataset(S2_dataset, decode_coords="all")
-    try:
-        image_name = xds.oname
-    except:
+    os.rename(f'{output_folder}/{chl_file}', f'{output_folder}/{chl_file[0:7]}_{image_date}T{image_time}_CHL.tif')
+    os.rename(f'{output_folder}/{spm_file}', f'{output_folder}/{spm_file[0:7]}_{image_date}T{image_time}_SPM.tif')
+    os.rename(f'{output_folder}/{tur_file}', f'{output_folder}/{tur_file[0:7]}_{image_date}T{image_time}_TUR.tif')
+
+    for file in all_files:
         try:
-            image_name = xds.output_name
+            os.remove(f'{output_folder}/{file}')
         except:
-            image_name = os.path.basename(S2_dataset)
-    day = datetime.datetime(*map(int, image_name.split('_')[2:8]))
-    sensor = image_name.split('_')[0]
-
-    # 2.a. variable selection
-    vars_list_2keep = ['transverse_mercator',
-                       'x',
-                       'y',
-                       'lon',
-                       'lat',
-                       'l2_flags',
-                       'chl_oc2_BLK',
-                       'chl_re_mishraBLK',
-                       'SPM_Nechad2010_665',
-                       'TUR_Nechad2009_665'
-                       ]
-
-    rrs_list = [elem for elem in list(xds.variables) if (elem[:3] in ['Rrs', 'rrs'])]
-    vars_list_2keep = vars_list_2keep + rrs_list
-
-    for var in list(xds.variables):
-        if var not in vars_list_2keep:
-            xds = xds.drop_vars(var)
-
-    # temp:
-    xds = xds.rename({'chl_oc2_BLK': 'chl_bluegreen'})
-    xds.chl_bluegreen.attrs['units'] = 'mg m-3'
-    xds = xds.rename({'chl_re_mishraBLK': 'chl_rededge'})
-    xds.chl_rededge.attrs['units'] = 'mg m-3'
-    try:
-        xds = xds.rename({'SPM_Nechad2010_665': 'SPM'})
-    except:
-        # temp SPM
-        A665 = 355.85
-        C665 = 0.1725
-        spm665  = A665 * xds.Rrs_665/np.pi / (1 - xds.Rrs_665/np.pi / C665)
-        xds['SPM'] = spm665
-        xds.SPM.attrs = {'units': 'g m-3',
-                         'long_name': 'suspended particulate matter',
-                         'parameter': 'SPM_Nechad2010_665',
-                         'algorithm': '2010 calibration',
-                         'title': 'Nechad SPM',
-                         'reference': 'Nechad et al. 2010',
-                         'A_SPM': '355.85',
-                         'C_SPM': '0.1725',
-                         }
-    try:
-        xds = xds.rename({'TUR_Nechad2009_665': 'TUR'})
-    except:
-        # temp TUR
-        A665 = 610.94
-        C665 = 0.2324
-        tur665 = A665 * xds.Rrs_665/np.pi / (1 - xds.Rrs_665/np.pi / C665)
-        xds['TUR'] = tur665
-        xds.TUR.attrs = {'units': 'FNU',
-                         'long_name': 'turbidity',
-                         'parameter': 'TUR_Nechad2009_665',
-                         'algorithm': '2010 calibration',
-                         'title': 'Nechad TUR',
-                         'reference': 'Nechad et al. 2009',
-                         'A_TUR': '610.94',
-                         'C_TUR': '0.2324',
-                     }
-
-    ###
-    #  2.b. attributes selection
-    xds.attrs['contact'] = 'dvanderzande@naturalsciences.be, cgoyens@naturalsciences.be'
-    xds.attrs['Instrument'] = 'Sentinel-2'
-    xds.attrs['Sensor'] = 'Sentinel-2'
-    xds.attrs['Processing level'] = 'L2W'
-
-    attrs_list_2keep = ['generated_by', 'generated_on', 'contact', 'product_type',
-                  'metadata_profile', 'metadata_version', 'Conventions', 'sensor',
-                  'global_dims', 'granule', 'oname', 'scene_xrange', 'scene_yrange',
-                  'scene_proj4_string', 'scene_pixel_size', 'scene_dims', 'limit',
-                  'proj4_string', 'pixel_size', 'projection_key', 'data_dimensions',
-                  'data_elements', 's2_target_res'
-                  ]
-
-    l2w_mask_list = [elem for elem in list(xds.attrs) if (elem[:8] in ['l2w_mask'])]
-    attrs_list_2keep = attrs_list_2keep + l2w_mask_list
-
-    for att in list(xds.attrs):
-        if att not in attrs_list_2keep:
-            xds.attrs.__delitem__(att)
-
-    #####
-    # resample
-    Resample = True
-    if Resample is True:
-        from scipy import ndimage
-
-        list2resample = [elem for elem in list(xds.variables) if elem not in [ 'l2_flags', 'lon', 'lat', 'x', 'y', 'transverse_mercator', 'spatial_ref']]
-        for item in list2resample:
-            xds[item].values = ndimage.median_filter(xds[item], 3)
-
-    #####
-    # 2.c. save to netcdf
-    # Creates output folder if does not exists
-    if os.path.exists(output_folder) is False: os.mkdir(output_folder)
-
-    # out_name = 'BLK_' + day.strftime('%Y_%m_%d_') + 'S2' + '.nc'
-    out_name =  'BLK_' + sensor + '_' + day.strftime('%Y_%m_%d') + '.nc'
-
-    # save to netcdf
-    xds.to_netcdf(os.path.join(output_folder, out_name))
-    xds.close()
-
-    print('saved to --> ', out_name)
+            pass
 
 def acolite_run(settings, inputfile=None, output=None):
     import glob, datetime, os
@@ -359,24 +258,12 @@ def acolite_run(settings, inputfile=None, output=None):
 
 
     # AD
-    # Create File for ONDA format
-    image_list = []
-    print("\n> saving to ONDA format")
+    # update files for CS platform
     for key in [key for key in processed[0].keys() if key in ['l1r', 'l2r', 'l2w']]:
         file = processed[0][key][0]
-        image_list.append(file)
-        # print(file)
+        output_folder = os.path.dirname(file)
 
-        if key == 'l2w':
-            create_S2_xarray_4_ONDA(file, os.path.dirname(file))
-        if key == 'l2r':
-            image_list.append(file[:-8] + '.nc')
-
-    for file in image_list:
-        # print(file)
-        # os.remove(file)
-        try: os.remove(file)
-        except: pass
+    cleaning_4_CS(output_folder)
 
     # AD
 

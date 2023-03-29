@@ -533,6 +533,10 @@ def acolite_l2w(gem,
                 par_name = 'chl_oc2_BLK'
             elif (cur_par == 'chl_oc3'):
                 par_name = 'chl_oc3'
+            elif (cur_par == 'chl_oc3_BLK'):
+                par_name = 'chl_oc3_BLK'
+            elif (cur_par == 'chl_oc3_SMAT'):
+                par_name = 'chl_oc3_SMAT'
             elif (cur_par == 'chl_oc4'):
                 par_name = 'chl_oc4'
             else:
@@ -619,6 +623,21 @@ def acolite_l2w(gem,
                 ###########
 
                 ###########
+                ## GONS VARYING BLK
+                if 'gons_varying' in cur_par:
+                    chl_re_algorithm = 'gons_varying'
+                    par_attributes['algorithm'] = 'adapted Gons et al. 3 band'
+                    par_attributes['reference'] = 'Gons et al. 2005'
+                    gons = ac.parameters.chl_re.coef_gons()
+                    req_waves = [670, 705, 780]
+                    gons_name = 'chl_re_gons'
+
+                    req_waves = [gons[gons_name][tag] for tag in ['red_band', 'rededge_band', 'nir_band']]
+                ## end GONS VARYING BLK
+                ###########
+
+
+                ###########
                 ## MOSES
                 if par_split[2][0:6] == 'moses3':
                     chl_re_algorithm = 'moses'
@@ -669,8 +688,20 @@ def acolite_l2w(gem,
                 if par_split[2][0:9] == 'mishraBLK':
                     chl_re_algorithm = 'mishraBLK'
                     par_attributes['reference']='Mishra et al. 2014'
-                    par_attributes['algorithm']='Mishra et al. 2014, NDCI'
-                    par_attributes['a']=(14.41984, 22.31125, 4.5900) ## put coefficients in external file
+                    par_attributes['algorithm']='Mishra et al. 2014, NDCI, modified for BLK'
+                    par_attributes['a']=(9.90394, 3.63135, 10.70727) ## put coefficients in external file
+                    ### get required datasets
+                    req_waves = [670,705]
+                ## end MISHRA BLK
+                ###########
+
+                ## MISHRA SMAT
+                if par_split[2][0:9] == 'mishraSMAT':
+                    chl_re_algorithm = 'mishraSMAT'
+                    par_attributes['reference']='Mishra et al. 2014'
+                    par_attributes['algorithm']='Mishra et al. 2014, NDCI, modified for SMAT'
+                    par_attributes['a']=(9.68041, -49.57658, 61.81215) ## put coefficients in external file
+
                     ### get required datasets
                     req_waves = [670,705]
                 ## end MISHRA BLK
@@ -735,6 +766,37 @@ def acolite_l2w(gem,
                 ###########
 
                 ###########
+                ## compute GONS VARYING
+                if chl_re_algorithm == 'gons_varying':
+                    for k in gons[gons_name]: par_attributes[k] = gons[gons_name][k]
+
+                    gc = gons[gons_name]['chl_coef']
+                    bb = (gc[0] * tmp_data[2]) / (gc[1] - gc[2] * tmp_data[2])
+                    rm = tmp_data[1]/tmp_data[0]
+                    par_data[par_name] = ((rm * (gc[3] + bb)) - gc[4] - np.power(bb,gc[5]))
+                    par_data[par_name] /= 0.05152  # changed for a fit them all astar (0.05152), then recaluclate with varying coefficient)
+
+                    chl_array = par_data[par_name]
+
+                    astarchl_array = []
+                    for chl in chl_array:
+                        astarchl = 1.1188 * chl ** -1  # 1.1188 * x ** -1
+                        astarchl_array.append(astarchl)
+
+                    par_data[par_name] = ((rm * (gc[3] + bb)) - gc[4] - np.power(bb, gc[5]))
+                    par_data[par_name] /= astarchl_array # with a varying astarchl
+
+
+                    if '_nocheck' not in par_name:
+                        par_data[par_name][par_data[par_name]<0]=np.nan
+                        gm = gons[gons_name]['validity']
+                        par_data[par_name][((tmp_data[0] <= gm[0]) | (tmp_data[1]/tmp_data[0] <= gm[1]))]=np.nan
+                    par_atts[par_name] = par_attributes
+                    tmp_data = None
+                ## end compute GONS VARYING
+                ###########
+
+                ###########
                 ## compute MOSES
                 if chl_re_algorithm == 'moses':
                     par_data[par_name] = par_attributes['a'][0]* \
@@ -777,6 +839,19 @@ def acolite_l2w(gem,
                     par_data[par_name] = par_attributes['a'][0] + par_attributes['a'][1]*ndci + par_attributes['a'][2]*ndci*ndci
                     ndci = None
                     par_data[par_name][par_data[par_name]<0]=np.nan
+                    par_atts[par_name] = par_attributes
+                    tmp_data = None
+                ## end compute MISHRA BLK
+                ###########
+
+                ###########
+                ## compute MISHRA SMAT
+                if chl_re_algorithm == 'mishraSMAT':
+                    ndci = (tmp_data[1] - tmp_data[0]) / (tmp_data[1] + tmp_data[0])
+                    par_data[par_name] = par_attributes['a'][0] + par_attributes['a'][1] * ndci + \
+                                         par_attributes['a'][2] * ndci * ndci
+                    ndci = None
+                    par_data[par_name][par_data[par_name] < 0] = np.nan
                     par_atts[par_name] = par_attributes
                     tmp_data = None
                 ## end compute MISHRA BLK

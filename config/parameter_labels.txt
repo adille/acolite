@@ -47,11 +47,14 @@ tur_dogliotti2015,1,100,True,Planck_Parchment_RGB,T Dogliotti,FNU
 #
 chl_oc2,0.03,30,True,Calgae255,CHL OC2,mgm$^{-3}$
 chl_oc3,0.03,30,True,Calgae255,CHL OC3,mgm$^{-3}$
+chl_oc3_BLK,0.03,30,True,Calgae255,CHL OC3 BLK,mgm$^{-3}$
+chl_oc3_SMAT,0.03,30,True,Calgae255,CHL OC3 SMAT,mgm$^{-3}$
 chl_oc4,0.03,30,True,Calgae255,CHL OC4,mgm$^{-3}$
 #
 ## CHL_RE
 #
 chl_re_gons,1,100,True,Calgae255,CHL Gons,mg m$^{-3}$
+chl_re_gons_varying,1,100,True,Calgae255,CHL Gons varying BLK,mg m$^{-3}$
 chl_re_gons740,1,100,True,Calgae255,CHL Gons740,mg m$^{-3}$
 chl_re_gons_nocheck,1,100,True,Calgae255,CHL Gons,mg m$^{-3}$
 chl_re_gons740_nocheck,1,100,True,Calgae255,CHL Gons740,mg m$^{-3}$
@@ -60,6 +63,7 @@ chl_re_moses3b740,1,100,True,Calgae255,CHL Moses740,mg m$^{-3}$
 chl_re_moses2bBLK,1,100,True,Calgae255,CHL Moses 2b BLK,mg m$^{-3}$
 chl_re_mishra,1,100,True,Calgae255,CHL Mishra,mg m$^{-3}$
 chl_re_mishraBLK,1,100,True,Calgae255,CHL Mishra BLK,mg m$^{-3}$
+chl_re_mishraSMAT,1,100,True,Calgae255,CHL Mishra SMAT,mg m$^{-3}$
 chl_re_bramich,1,100,True,Calgae255,CHL Bramich,mg m$^{-3}$
 #
 ## indices
