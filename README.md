@@ -1,3 +1,8 @@
+Modification of ACOLITE code for CALLISTO platform.
+Changes to the original code (v202204):
+* Optimisation of CHL coefficients for Blankaert and La Loggia reservoirs
+* Output of TUR, SPM and CHL tiff files only
+
 ## About ACOLITE
 ACOLITE combines the atmospheric correction algorithms for aquatic applications of Landsat and Sentinel-2 developed at RBINS. This repository hosts the (more) generic version of ACOLITE with the aim of bringing together the processing of all different sensors. This new generic version was started 4 February 2021, and was released to the public on 21 April 2021. Binary releases from 20210802.0 onward are based on this codebase. Please contact Quinten via email/ACOLITE Forum/GitHub if you find any issues. The settings files are largely compatible with previous versions, but it is recommended to create a new settings file configuring only the settings you want to change.
 
