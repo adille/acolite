@@ -8,7 +8,7 @@
 ##                2023-03-29 (AD) modified for CS tiff
 
 # AD
-def cleaning_4_CS(output_folder):
+def cleaning_4_CS(output_folder, L2W_delete = True):
     import os
     print("\n >> renaming for CALLISTO platform")
     # rename CHL, SPM and delete others
@@ -23,6 +23,11 @@ def cleaning_4_CS(output_folder):
     os.rename(f'{output_folder}/{chl_file}', f'{output_folder}/{chl_file[0:7]}_{image_date}T{image_time}_CHL.tif')
     os.rename(f'{output_folder}/{spm_file}', f'{output_folder}/{spm_file[0:7]}_{image_date}T{image_time}_SPM.tif')
     os.rename(f'{output_folder}/{tur_file}', f'{output_folder}/{tur_file[0:7]}_{image_date}T{image_time}_TUR.tif')
+
+    if L2W_delete is False:
+        L2W_files = [file for file in os.listdir(output_folder) if 'L2W' in file and file.endswith('.nc')]
+        for L2W_file in L2W_files:
+            all_files.remove(L2W_file)
 
     for file in all_files:
         try:
@@ -263,7 +268,7 @@ def acolite_run(settings, inputfile=None, output=None):
         file = processed[0][key][0]
         output_folder = os.path.dirname(file)
 
-    cleaning_4_CS(output_folder)
+    cleaning_4_CS(output_folder, L2W_delete=False)
 
     # AD
 
