@@ -58,8 +58,8 @@ A suitable Python environment can for example be set up using conda and the pack
             conda install -c conda-forge numpy matplotlib scipy gdal pyproj scikit-image pyhdf pyresample netcdf4 h5py requests pygrib astropy cartopy
 
 ## Installation
-* cd into a suitable directory and clone the git repository: `git clone --depth 1 https://github.com/acolite/acolite`
-* cd into the new acolite directory `cd acolite`
+* cd into a suitable directory and clone the git repository: `git clone --depth 1 https://github.com/adille/acolite_callisto`
+* cd into the new acolite directory `cd acolite_callisto`
 * run `python launch_acolite.py`
 
 ## Ancillary and SRTM DEM data download
