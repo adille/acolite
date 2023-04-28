@@ -29,6 +29,7 @@ def cleaning_4_CS(output_folder, L2W_delete = True):
         for L2W_file in L2W_files:
             all_files.remove(L2W_file)
 
+    print(f'\n > deleting files: {all_files}')
     for file in all_files:
         try:
             os.remove(f'{output_folder}/{file}')
