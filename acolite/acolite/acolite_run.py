@@ -26,11 +26,11 @@ def cleaning_4_CS(output_folder, L2W_delete = True):
 
     if L2W_delete is False:
         L2W_files = [file for file in os.listdir(output_folder) if 'L2W' in file and file.endswith('.nc')]
-        L2W_files = [file for file in L2W_files if all(x not in file for x in ['CHL', 'SPM', 'TUR'])]
 
         for L2W_file in L2W_files:
             all_files.remove(L2W_file)
 
+    all_files = [file for file in all_files if all(x not in file for x in ['CHL', 'SPM', 'TUR'])] # do not delete TUR, SPM, CHL
     print(f'\n > deleting files: {all_files}')
     for file in all_files:
         try:
