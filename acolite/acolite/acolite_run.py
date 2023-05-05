@@ -270,7 +270,7 @@ def acolite_run(settings, inputfile=None, output=None):
         output_folder = os.path.dirname(file)
 
     cleaning_4_CS(output_folder, L2W_delete=False)
-
+    print('\n finished deleting files ') # debug
     # AD
 
         ## end processing loop
