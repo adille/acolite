@@ -284,12 +284,15 @@ def acolite_run(settings, inputfile=None, output=None):
             if l1r_setu['{}_delete_netcdf'.format(level)]:
                 ## run through images and delete them
                 for f in processed[ni][level]:
-                    os.remove(f)
-                    ## also delete pan file if it exists
-                    if level == 'l1r':
-                        panf = f.replace('_L1R.nc', '_L1R_pan.nc')
-                        if os.path.exists(panf):
-                            os.remove(panf)
+                    try:
+                        os.remove(f)
+                        ## also delete pan file if it exists
+                        if level == 'l1r':
+                            panf = f.replace('_L1R.nc', '_L1R_pan.nc')
+                            if os.path.exists(panf):
+                                os.remove(panf)
+                    except: #already deleted
+                        pass
                 ## replace by empty list
                 processed[ni][level] = []
 
